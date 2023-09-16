@@ -5,16 +5,16 @@
 function generateVdfIndentString {
     spacetype="${2:-\t}"  # Type of space, expected values could be '\t' (for writing) or '[[:space:]]' (for searching)
 
-    printf "%.0s${spacetype}" $(seq 1 $1)
+    printf "%.0s${spacetype}" $(seq 1 "$1")
 }
 
 
 # Attempt to get the indentation level of the first occurance of a given VDF block
 function guessVdfIndent {
-    block_name="$1"  # Block to check the indentation level on
+    block_name="$( safequoteVdfBlockName "$1" )"  # Block to check the indentation level on
     vdf="$2"
 
-    echo $( grep "${block_name}" "$vdf" | awk '{print gsub(/\t/,"")}' )
+    grep "${block_name}" "$vdf" | awk '{print gsub(/\t/,"")}'
 }
 
 
@@ -50,10 +50,7 @@ function getVdfSection {
 
 # Unsure where this is used outside of config.vdf
 function getLongSteamUserId {
-    accounts_indent="$( printf '%.0s[[:space:]]' $(seq 1 4) )"  # Accounts block starts at indent level 4
-    username_indent="$( printf '%.0s[[:space:]]' $(seq 1 5) )"
-    
-    username="$1"
+    username="$( safequoteVdfBlockName "$1" )"
     config_vdf="$2"
 
     accounts_block="$( getVdfSection "Accounts" "" "" "$config_vdf" )"
@@ -75,7 +72,7 @@ function getLongSteamUserId {
 
 # This is the Steam UserID used to name the userdata folder
 function getShortSteamUserId {
-    username="$1"
+    username="$( safequoteVdfBlockName "$1" )"
     config_vdf="$2"
 
     long_user_id="$( getLongSteamUserId "$username" "$config_vdf" )"
