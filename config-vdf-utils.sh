@@ -48,6 +48,28 @@ function getVdfSection {
 }
 
 
+# Check if a VDF block (block_name) already exists inside a parent block (search_block)
+# Ex: search_block "CompatToolMapping" for a specific block_name "22320"
+function checkVdfSectionAlreadyExists {
+    search_block="$( safequoteVdfBlockName "${1:-\"}" )"  # Default to the first quotation, should be the start VDF file
+    block_name="$( safequoteVdfBlockName "$2" )"  # Block name to  search for
+    vdf="$3"
+
+    if [ -z "$block_name" ]; then
+        echo "Block name must be provided!"
+        return
+    fi
+
+    search_block_vdf_section="$( getVdfSection "$search_block" "" "" "vdf" )"
+    if [ -z "$search_block_vdf_section" ]; then
+        return 0
+    fi
+
+    printf "%s" "$search_block_vdf_section" > "/tmp/tmp.vdf"
+    getVdfSection "$block_name" "" "" "/tmp/tmp.vdf" | grep -q "$block_name"
+}
+
+
 # Unsure where this is used outside of config.vdf
 function getLongSteamUserId {
     username="$( safequoteVdfBlockName "$1" )"
