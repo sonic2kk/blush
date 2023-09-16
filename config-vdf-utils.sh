@@ -5,7 +5,7 @@
 function generateVdfIndentString {
     spacetype="${2:-\t}"  # Type of space, expected values could be '\t' (for writing) or '[[:space:]]' (for searching)
 
-    printf '%.0s[[:space:]]' $(seq 1 $1)
+    printf "%.0s${spacetype}" $(seq 1 $1)
 }
 
 
