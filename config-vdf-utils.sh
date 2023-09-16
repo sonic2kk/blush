@@ -60,7 +60,7 @@ function checkVdfSectionAlreadyExists {
         return
     fi
 
-    search_block_vdf_section="$( getVdfSection "$search_block" "" "" "vdf" )"
+    search_block_vdf_section="$( getVdfSection "$search_block" "" "" "$vdf" )"
     if [ -z "$search_block_vdf_section" ]; then
         return 0
     fi
