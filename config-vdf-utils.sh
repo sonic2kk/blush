@@ -56,13 +56,13 @@ function getLongSteamUserId {
     username="$1"
     config_vdf="$2"
 
-    accounts_block="$( getVdfSection "${accounts_indent}\"Accounts\"" "^${accounts_indent}}" "$config_vdf" )"
+    accounts_block="$( getVdfSection "Accounts" "" "" "$config_vdf" )"
     if [ -z "$accounts_block" ]; then
         echo "No accounts block in config.vdf file ('$config_vdf')."
         return
     fi
     
-    username_block="$( getVdfSection "${username_indent}\"${username}\"" "${username_indent}}" "$config_vdf" )"
+    username_block="$( getVdfSection "${username}" "" "" "$config_vdf" )"
     if [ -z "$username_block" ]; then
         echo "Username not found in  config.vdf file ('$config_vdf')."
         return
@@ -73,7 +73,7 @@ function getLongSteamUserId {
 }
 
 
-# This is used in userdata folder
+# This is the Steam UserID used to name the userdata folder
 function getShortSteamUserId {
     username="$1"
     config_vdf="$2"
