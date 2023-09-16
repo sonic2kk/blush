@@ -99,7 +99,7 @@ function createVdfEntry {
     block_tab_str="$( generateVdfIndentString "$block_tab_amt" )"
 
     # Calculations for line numbers
-    parent_block_length="$( getVdfSection "$parent_block_name" "" "" "$vdf_path" | wc -l )"
+    parent_block_length="$( getVdfSection "$parent_block_name" "" "" "$vdf" | wc -l )"
     block_start_line="$( grep -in "${parent_block_name}" "$vdf" | cut -d ':' -f1 | xargs )"
 
     top_of_block="$(( block_start_line + 1 ))"
