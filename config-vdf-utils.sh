@@ -1,11 +1,52 @@
 #!/usr/bin/env bash
 
-function getVdfSection {
-    start_pattern="$1"
-    end_pattern="$2"
-    vdf="$3"
-    sed -n "/${start_pattern}/,/${end_pattern}/ p" "$vdf"
+
+# Generate string of [[:space:]] to represent indentation in VDF file, useful for searching
+function generateVdfIndentString {
+    spacetype="${2:-\t}"  # Type of space, expected values could be '\t' (for writing) or '[[:space:]]' (for searching)
+
+    printf '%.0s[[:space:]]' $(seq 1 $1)
 }
+
+
+# Attempt to get the indentation level of the first occurance of a given VDF block
+function guessVdfIndent {
+    block_name="$1"  # Block to check the indentation level on
+    vdf="$2"
+
+    echo $( grep "${block_name}" "$vdf" | awk '{print gsub(/\t/,"")}' )
+}
+
+
+# Surround a VDF block name with quotes if it doesn't have any
+function safequoteVdfBlockName {
+    quoted_blockname="$1"
+    if ! [[ $quoted_blockname == \"* ]]; then
+        quoted_blockname="\"$quoted_blockname\""
+    fi
+
+    echo "$quoted_blockname"
+}
+
+
+# Use sed to grab a section of a given VDF file based on its indentation level
+function getVdfSection {
+    start_pattern="$( safequoteVdfBlockName "$1" )"
+    end_pattern="${2:-\}}"  # Default end pattern to end of block
+    indent="$3"
+    vdf="$4"
+
+    if [ -z "$indent" ]; then
+        indent="$(( $( guessVdfIndent "$start_pattern" "$vdf" ) ))"
+    fi
+
+    indent_str="$( generateVdfIndentString "$indent" "[[:space:]]" )"
+    indented_start_pattern="${indent_str}${start_pattern}"
+    indented_end_pattern="${indent_str}${end_pattern}"
+
+    sed -n "/${indented_start_pattern}/,/^${indented_end_pattern}/ p" "$vdf"
+}
+
 
 # Unsure where this is used outside of config.vdf
 function getLongSteamUserId {
@@ -30,6 +71,7 @@ function getLongSteamUserId {
     # Extract just the ID from the block corresponding to the given username
     echo "$username_block" | grep '"SteamID"' | xargs | cut -d " " -f2 
 }
+
 
 # This is used in userdata folder
 function getShortSteamUserId {
